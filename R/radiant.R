@@ -291,12 +291,12 @@ get_data <- function(
     paste0("Dataset ", dataset, " is not available. Please load the dataset") %>%
       stop(call. = FALSE)
   }} %>%
-    convert_data() %>%
-    {if ("grouped_df" %in% class(.)) ungroup(.) else .} %>% ## ungroup data if needed
-    {if (filt == "") . else filter_data(., filt)} %>% ## apply data_filter
-    {if (is.null(rows)) . else .[rows, , drop = FALSE]} %>%
-    {if (is_empty(vars[1])) . else select(., !!!if (any(grepl(":", vars))) rlang::parse_exprs(paste0(vars, collapse = ";")) else vars)} %>%
-    {if (na.rm) na.omit(.) else .}
+    convert_data()  #%>%
+    # {if ("grouped_df" %in% class(.)) ungroup(.) else .} %>% ## ungroup data if needed
+    # {if (filt == "") . else filter_data(., filt)} %>% ## apply data_filter
+    # {if (is.null(rows)) . else .[rows, , drop = FALSE]} %>%
+    # {if (is_empty(vars[1])) . else select(., !!!if (any(grepl(":", vars))) rlang::parse_exprs(paste0(vars, collapse = ";")) else vars)} %>%
+    # {if (na.rm) na.omit(.) else .}
 }
 
 #' Convert characters to factors
