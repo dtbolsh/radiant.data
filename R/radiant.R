@@ -246,6 +246,34 @@ find_home <- function() {
 #' get_data(mtcars, vars = "cyl:vs", filt = "mpg > 25")
 #' get_data(mtcars, vars = c("mpg", "cyl"), rows = 1:10)
 #' @export
+convert_data <- function(df) {
+  exp_name <- df[1,3]
+  exp_date <- df[1,7]
+  exp_goal <- df[1,10]
+  df_data <- df %>% select(-1) %>% slice(-c(1:2))
+  colnames(df_data) = df_data[1,]
+  type <- as.character(as.vector(df_data[3,]))
+  
+  df_data <- slice(df_data, -c(1:4))
+  
+  colnames(df_data) <- gsub(" ", "_", colnames(df_data))
+  df_data[ df_data == "NA" ] <- NA
+  out <- convert.magic(df_data,type)
+  return(out)
+}
+convert.magic <- function(x, y=NA) {
+  for(i in 1:length(y)) { 
+    if (y[i] == "continuous") { 
+      x[i] <- as.numeric(x[[i]])
+    }
+    if (y[i] == "continuous, integer") { 
+      x[i] <- as.integer(x[[i]])
+    }
+    if (y[i] == "discrete")
+      x[i] <- as.factor(x[[i]])
+  }
+  return(x)
+}
 get_data <- function(
                      dataset, vars = "", filt = "",
                      rows = NULL, na.rm = TRUE,
@@ -263,6 +291,7 @@ get_data <- function(
     paste0("Dataset ", dataset, " is not available. Please load the dataset") %>%
       stop(call. = FALSE)
   }} %>%
+    convert_data() %>%
     {if ("grouped_df" %in% class(.)) ungroup(.) else .} %>% ## ungroup data if needed
     {if (filt == "") . else filter_data(., filt)} %>% ## apply data_filter
     {if (is.null(rows)) . else .[rows, , drop = FALSE]} %>%
